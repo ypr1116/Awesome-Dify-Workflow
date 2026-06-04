@@ -1,0 +1,1837 @@
+---
+app:
+  description: V4.1：在 V4 Policy/Risk Guarded 基础上增加短期会话记忆、order_only 路由和更自然兜底。
+  icon: "\U0001F6E1️"
+  icon_background: "#FFEAD5"
+  mode: advanced-chat
+  name: 电商售后客服 Agent Demo V4.1 Memory Friendly
+  use_icon_as_answer_icon: false
+dependencies: []
+kind: app
+version: 0.1.5
+workflow:
+  conversation_variables:
+  - description: V4.1 short-term after-sales memory
+    id: 73c9dd76-d4e8-4ec0-89d2-c61d6c215147
+    name: last_order_id
+    value: ''
+    value_type: string
+  - description: V4.1 short-term after-sales memory
+    id: 4182abc7-f5de-481f-a3be-1e3585113723
+    name: pending_intent
+    value: ''
+    value_type: string
+  - description: V4.1 short-term after-sales memory
+    id: 12c80eb0-4bf7-4f1b-aa23-fc6bc3c78e88
+    name: pending_reason
+    value: ''
+    value_type: string
+  - description: V4.1 short-term after-sales memory
+    id: 6ecb9bd2-a7ff-4579-b577-4ad636f10b01
+    name: pending_complaint_type
+    value: ''
+    value_type: string
+  - description: V4.1 short-term after-sales memory
+    id: 90f8af13-1726-4814-804a-b97be2565176
+    name: pending_description
+    value: ''
+    value_type: string
+  - description: V4.1 short-term after-sales memory
+    id: b9ed590e-e727-43e2-8db0-e7c81c48f49e
+    name: last_route
+    value: ''
+    value_type: string
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - ".JPG"
+      - ".JPEG"
+      - ".PNG"
+      - ".GIF"
+      - ".WEBP"
+      - ".SVG"
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 5
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: 你好，我是电商售后客服 Agent Demo V4.1。我可以记住最近的订单号和待处理诉求，帮你查询订单、申请退款或提交投诉。
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions:
+    - 我想查一下订单 OD202605240001
+    - 我要退款，订单号是 OD202605240003
+    - 订单 OD202605240001 物流太慢了，我要投诉
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: agent
+      id: start-source-agent_intent-target
+      source: start
+      sourceHandle: source
+      target: agent_intent
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: agent
+        targetType: code
+      id: agent_intent-source-validate_and_route-target
+      source: agent_intent
+      sourceHandle: source
+      target: validate_and_route
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: answer
+      id: route_by_intent-missing_order-answer_missing_order-target
+      source: route_by_intent
+      sourceHandle: missing_order
+      target: answer_missing_order
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: answer
+      id: route_by_intent-invalid_order-answer_invalid_order-target
+      source: route_by_intent
+      sourceHandle: invalid_order
+      target: answer_invalid_order
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: code
+      id: route_by_intent-query_order-tool_query_order-target
+      source: route_by_intent
+      sourceHandle: query_order
+      target: tool_query_order
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: code
+      id: route_by_intent-refund-tool_check_refund-target
+      source: route_by_intent
+      sourceHandle: refund
+      target: tool_check_refund
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: code
+      id: route_by_intent-complaint-tool_create_complaint_ticket-target
+      source: route_by_intent
+      sourceHandle: complaint
+      target: tool_create_complaint_ticket
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: answer
+      id: route_by_intent-false-answer_fallback-target
+      source: route_by_intent
+      sourceHandle: 'false'
+      target: answer_fallback
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: answer
+      id: tool_query_order-source-answer_query_order-target
+      source: tool_query_order
+      sourceHandle: source
+      target: answer_query_order
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: code
+      id: tool_check_refund-source-policy_lookup-target
+      source: tool_check_refund
+      sourceHandle: source
+      target: policy_lookup
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: code
+      id: tool_create_complaint_ticket-source-policy_lookup-target
+      source: tool_create_complaint_ticket
+      sourceHandle: source
+      target: policy_lookup
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: code
+      id: policy_lookup-source-calculate_risk_score-target
+      source: policy_lookup
+      sourceHandle: source
+      target: calculate_risk_score
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: code
+      id: calculate_risk_score-source-draft_v4_reply-target
+      source: calculate_risk_score
+      sourceHandle: source
+      target: draft_v4_reply
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: llm
+      id: draft_v4_reply-source-answer_verifier-target
+      source: draft_v4_reply
+      sourceHandle: source
+      target: answer_verifier
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: code
+      id: answer_verifier-source-select_verified_answer-target
+      source: answer_verifier
+      sourceHandle: source
+      target: select_verified_answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: answer
+      id: select_verified_answer-source-answer_v4_final-target
+      source: select_verified_answer
+      sourceHandle: source
+      target: answer_v4_final
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: answer
+      id: route_by_intent-order_only-answer_order_only-target
+      source: route_by_intent
+      sourceHandle: order_only
+      target: answer_order_only
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: assigner
+      id: validate_and_route-source-assign_last_order_id-target
+      source: validate_and_route
+      sourceHandle: source
+      target: assign_last_order_id
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: assigner
+        targetType: assigner
+      id: assign_last_order_id-source-assign_pending_intent-target
+      source: assign_last_order_id
+      sourceHandle: source
+      target: assign_pending_intent
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: assigner
+        targetType: assigner
+      id: assign_pending_intent-source-assign_pending_reason-target
+      source: assign_pending_intent
+      sourceHandle: source
+      target: assign_pending_reason
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: assigner
+        targetType: assigner
+      id: assign_pending_reason-source-assign_pending_complaint_type-target
+      source: assign_pending_reason
+      sourceHandle: source
+      target: assign_pending_complaint_type
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: assigner
+        targetType: assigner
+      id: assign_pending_complaint_type-source-assign_pending_description-target
+      source: assign_pending_complaint_type
+      sourceHandle: source
+      target: assign_pending_description
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: assigner
+        targetType: assigner
+      id: assign_pending_description-source-assign_last_route-target
+      source: assign_pending_description
+      sourceHandle: source
+      target: assign_last_route
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: assigner
+        targetType: if-else
+      id: assign_last_route-source-route_by_intent-target
+      source: assign_last_route
+      sourceHandle: source
+      target: route_by_intent
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: 接收用户输入，不额外采集表单字段。
+        selected: false
+        title: 开始
+        type: start
+        variables: []
+      height: 54
+      id: start
+      position:
+        x: 80
+        "y": 260
+      positionAbsolute:
+        x: 80
+        "y": 260
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        agent_parameters:
+          instruction:
+            type: constant
+            value: |
+              你是“电商售后客服 Agent Demo V4”的参数抽取 Agent。请只输出 JSON，不要输出 Markdown。
+
+              支持意图：
+              - query_order：查订单/查物流/到哪了/订单状态
+              - refund：申请退款/退钱/退货退款/能不能退
+              - complaint：投诉/抱怨物流慢/服务差/商品质量问题
+              - chitchat：闲聊或其他咨询
+
+              你需要从用户输入中提取：intent、order_id、reason、complaint_type、description、user_emotion、requested_action、compensation_requested、policy_question。
+              订单号合法格式是 OD + 12 位数字，例如 OD202605240001；本节点只负责抽取，格式校验由后续 Workflow 完成。
+
+              字段说明：
+              - user_emotion：normal|angry|urgent。用户生气、离谱、威胁投诉通常为 angry；催促、马上、立刻通常为 urgent。
+              - requested_action：query|refund|complaint|consult|compensation|other。
+              - compensation_requested：true|false。出现赔偿、补偿、退 1000 元、要你们赔等为 true。
+              - policy_question：true|false。询问能不能退、政策是什么、七天无理由等为 true。
+
+              输出 JSON 格式：
+              {"intent":"query_order|refund|complaint|chitchat","order_id":"","reason":"","complaint_type":"","description":"","user_emotion":"normal|angry|urgent","requested_action":"query|refund|complaint|consult|compensation|other","compensation_requested":"true|false","policy_question":"true|false"}
+          model:
+            type: constant
+            value:
+              completion_params:
+                temperature: 0.1
+              mode: chat
+              model: gpt-4o-mini
+              model_type: llm
+              provider: langgenius/openai/openai
+              type: model-selector
+          query:
+            type: constant
+            value: "{{#sys.query#}}"
+          tools:
+            type: constant
+            value: []
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        desc: 基于原始 Agent 节点改造：负责意图识别和参数抽取，模拟工具由后续 Workflow 代码节点承接。
+        output_schema:
+        plugin_unique_identifier: langgenius/agent:0.0.4@5eb03c08764cc37249f9ef18b89903a99493f6d02c4d5b8ffb40b9f7ef4e865c
+        selected: false
+        title: Agent：识别售后意图与参数
+        type: agent
+      height: 198
+      id: agent_intent
+      position:
+        x: 380
+        "y": 260
+      positionAbsolute:
+        x: 380
+        "y": 260
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: |
+          import json
+          import re
+
+          ORDER_PATTERN = re.compile(r"^OD\d{12}$")
+          ORDER_CANDIDATE_PATTERN = re.compile(r"OD\w+|\b\d{3,}\b|[a-zA-Z]{3,}")
+
+
+          def _safe_json(text):
+              if not text:
+                  return {}
+              text = text.strip()
+              try:
+                  return json.loads(text)
+              except Exception:
+                  match = re.search(r"\{.*\}", text, re.S)
+                  if match:
+                      try:
+                          return json.loads(match.group(0))
+                      except Exception:
+                          return {}
+              return {}
+
+
+          def _valid_order(order_id):
+              return bool(order_id and ORDER_PATTERN.match(order_id))
+
+
+          def _fallback_intent(query):
+              q = query or ""
+              if any(k in q for k in ["退款", "退钱", "退货", "能不能退", "可以退"]):
+                  return "refund"
+              if any(k in q for k in ["投诉", "太慢", "服务差", "不满意", "质量问题", "质量", "物流"]):
+                  return "complaint"
+              if any(k in q for k in ["订单", "到哪", "状态", "发货", "签收"]):
+                  return "query_order"
+              return "chitchat"
+
+
+          def _fallback_emotion(query):
+              q = query or ""
+              if any(k in q for k in ["生气", "离谱", "投诉威胁", "不退就投诉", "太过分", "愤怒"]):
+                  return "angry"
+              if any(k in q for k in ["马上", "立刻", "赶紧", "急", "尽快"]):
+                  return "urgent"
+              return "normal"
+
+
+          def _fallback_requested_action(query, intent):
+              q = query or ""
+              if any(k in q for k in ["赔偿", "补偿", "退 1000", "退1000"]):
+                  return "compensation"
+              if intent == "refund":
+                  return "refund"
+              if intent == "complaint":
+                  return "complaint"
+              if intent == "query_order":
+                  return "query"
+              if any(k in q for k in ["政策", "能不能", "支持", "七天无理由"]):
+                  return "consult"
+              return "other"
+
+
+          def _bool_text(value, default="false"):
+              if isinstance(value, bool):
+                  return "true" if value else "false"
+              if value is None or value == "":
+                  return default
+              value = str(value).strip().lower()
+              return "true" if value in ["true", "1", "yes", "是"] else "false"
+
+
+          def _extract_order_id(query, parsed_order_id):
+              if parsed_order_id:
+                  return str(parsed_order_id).strip()
+              match = re.search(r"OD\d{12}", query or "")
+              if match:
+                  return match.group(0)
+              return ""
+
+
+          def _extract_candidate(query, order_id):
+              if order_id:
+                  return order_id
+              q = query or ""
+              if "忘了订单号" in q or "没有订单号" in q or "没订单号" in q:
+                  return ""
+              if ("退 1000" in q or "退1000" in q or "赔偿" in q or "补偿" in q) and "订单号" not in q and "OD" not in q:
+                  return ""
+              for match in ORDER_CANDIDATE_PATTERN.finditer(q):
+                  token = match.group(0)
+                  if token in ["refund", "query", "order", "abc"] or token.startswith("OD") or token.isdigit():
+                      return token
+              return ""
+
+
+          def _clean(value):
+              return value or ""
+
+
+          def main(agent_text: str, query: str, last_order_id: str, pending_intent: str, pending_reason: str, pending_complaint_type: str, pending_description: str, last_route: str) -> dict:
+              parsed = _safe_json(agent_text)
+              q = query or ""
+              stripped = q.strip()
+              only_order_id = bool(ORDER_PATTERN.match(stripped))
+
+              raw_intent = parsed.get("intent") or _fallback_intent(q)
+              if raw_intent not in ["query_order", "refund", "complaint", "chitchat"]:
+                  raw_intent = _fallback_intent(q)
+
+              order_id = _extract_order_id(q, parsed.get("order_id", ""))
+              candidate = _extract_candidate(q, order_id)
+
+              # If the user only supplies a valid order number and a pending intent exists,
+              # inherit the pending intent and pending slots from previous turn.
+              inherited_pending = "false"
+              if only_order_id and pending_intent in ["query_order", "refund", "complaint"]:
+                  intent = pending_intent
+                  inherited_pending = "true"
+              elif only_order_id:
+                  intent = "chitchat"
+              else:
+                  intent = raw_intent
+
+              reason = parsed.get("reason") or (pending_reason if inherited_pending == "true" else "")
+              complaint_type = parsed.get("complaint_type") or (pending_complaint_type if inherited_pending == "true" else "售后投诉")
+              description = parsed.get("description") or (pending_description if inherited_pending == "true" else q)
+
+              # If user references a complaint/refund intent without order_id but we have last_order_id,
+              # reuse last_order_id for follow-up after-sales requests such as “物流太慢了，我要投诉”.
+              used_last_order_id = "false"
+              if not order_id and not candidate and intent in ["complaint"] and _valid_order(last_order_id):
+                  order_id = last_order_id
+                  candidate = last_order_id
+                  used_last_order_id = "true"
+
+              user_emotion = parsed.get("user_emotion") or _fallback_emotion(q)
+              if user_emotion not in ["normal", "angry", "urgent"]:
+                  user_emotion = _fallback_emotion(q)
+
+              requested_action = parsed.get("requested_action") or _fallback_requested_action(q, intent)
+              if requested_action not in ["query", "refund", "complaint", "consult", "compensation", "other"]:
+                  requested_action = _fallback_requested_action(q, intent)
+
+              compensation_requested = _bool_text(parsed.get("compensation_requested"), "false")
+              if any(k in q for k in ["赔偿", "补偿", "退 1000", "退1000"]):
+                  compensation_requested = "true"
+
+              policy_question = _bool_text(parsed.get("policy_question"), "false")
+              if any(k in q for k in ["能不能退", "政策", "七天无理由", "可以退", "支持退"]):
+                  policy_question = "true"
+
+              order_required = intent in ["query_order", "refund", "complaint"]
+              order_id_format_valid = _valid_order(order_id)
+
+              if only_order_id and inherited_pending == "false":
+                  route = "order_only"
+              elif order_required and not candidate:
+                  route = "missing_order"
+              elif order_required and not order_id_format_valid:
+                  route = "invalid_order"
+                  order_id = candidate
+              elif intent == "query_order":
+                  route = "query_order"
+              elif intent == "refund":
+                  route = "refund"
+              elif intent == "complaint":
+                  route = "complaint"
+              else:
+                  route = "fallback"
+
+              # Conversation memory updates.
+              new_last_order_id = last_order_id or ""
+              new_pending_intent = ""
+              new_pending_reason = ""
+              new_pending_complaint_type = ""
+              new_pending_description = ""
+
+              if order_id_format_valid:
+                  new_last_order_id = order_id
+
+              if route == "missing_order":
+                  new_pending_intent = intent
+                  new_pending_reason = reason
+                  new_pending_complaint_type = complaint_type
+                  new_pending_description = description
+              elif route == "order_only":
+                  # Keep pending empty when the user has not expressed a request.
+                  new_pending_intent = ""
+              else:
+                  # Successful route or invalid/fallback clears pending request to avoid stale actions.
+                  new_pending_intent = ""
+
+              return {
+                  "intent": intent,
+                  "order_id": order_id,
+                  "reason": reason,
+                  "complaint_type": complaint_type,
+                  "description": description,
+                  "user_emotion": user_emotion,
+                  "requested_action": requested_action,
+                  "compensation_requested": compensation_requested,
+                  "policy_question": policy_question,
+                  "order_required": "true" if order_required else "false",
+                  "order_id_format_valid": "true" if order_id_format_valid else "false",
+                  "route": route,
+                  "inherited_pending": inherited_pending,
+                  "used_last_order_id": used_last_order_id,
+                  "new_last_order_id": new_last_order_id,
+                  "new_pending_intent": new_pending_intent,
+                  "new_pending_reason": new_pending_reason,
+                  "new_pending_complaint_type": new_pending_complaint_type,
+                  "new_pending_description": new_pending_description,
+                  "new_last_route": route,
+              }
+        code_language: python3
+        desc: 判断是否需要订单号、是否缺失、格式是否合法；订单号缺失或格式错误时不会进入工具分支。
+        outputs:
+          complaint_type:
+            children:
+            type: string
+          description:
+            children:
+            type: string
+          intent:
+            children:
+            type: string
+          order_id:
+            children:
+            type: string
+          order_id_format_valid:
+            children:
+            type: string
+          order_required:
+            children:
+            type: string
+          reason:
+            children:
+            type: string
+          route:
+            children:
+            type: string
+          user_emotion:
+            children:
+            type: string
+          requested_action:
+            children:
+            type: string
+          compensation_requested:
+            children:
+            type: string
+          policy_question:
+            children:
+            type: string
+          inherited_pending:
+            children:
+            type: string
+          used_last_order_id:
+            children:
+            type: string
+          new_last_order_id:
+            children:
+            type: string
+          new_pending_intent:
+            children:
+            type: string
+          new_pending_reason:
+            children:
+            type: string
+          new_pending_complaint_type:
+            children:
+            type: string
+          new_pending_description:
+            children:
+            type: string
+          new_last_route:
+            children:
+            type: string
+        selected: false
+        title: 校验订单号并生成路由
+        type: code
+        variables:
+        - value_selector:
+          - agent_intent
+          - text
+          variable: agent_text
+        - value_selector:
+          - sys
+          - query
+          variable: query
+        - value_selector:
+          - conversation
+          - last_order_id
+          variable: last_order_id
+        - value_selector:
+          - conversation
+          - pending_intent
+          variable: pending_intent
+        - value_selector:
+          - conversation
+          - pending_reason
+          variable: pending_reason
+        - value_selector:
+          - conversation
+          - pending_complaint_type
+          variable: pending_complaint_type
+        - value_selector:
+          - conversation
+          - pending_description
+          variable: pending_description
+        - value_selector:
+          - conversation
+          - last_route
+          variable: last_route
+      height: 98
+      id: validate_and_route
+      position:
+        x: 680
+        "y": 260
+      positionAbsolute:
+        x: 680
+        "y": 260
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: missing_order
+          conditions:
+          - comparison_operator: "="
+            id: cond_missing_order
+            value: missing_order
+            varType: string
+            variable_selector:
+            - validate_and_route
+            - route
+          id: missing_order
+          logical_operator: and
+        - case_id: invalid_order
+          conditions:
+          - comparison_operator: "="
+            id: cond_invalid_order
+            value: invalid_order
+            varType: string
+            variable_selector:
+            - validate_and_route
+            - route
+          id: invalid_order
+          logical_operator: and
+        - case_id: order_only
+          conditions:
+          - comparison_operator: "="
+            id: cond_order_only
+            value: order_only
+            varType: string
+            variable_selector:
+            - validate_and_route
+            - route
+          id: order_only
+          logical_operator: and
+        - case_id: query_order
+          conditions:
+          - comparison_operator: "="
+            id: cond_query_order
+            value: query_order
+            varType: string
+            variable_selector:
+            - validate_and_route
+            - route
+          id: query_order
+          logical_operator: and
+        - case_id: refund
+          conditions:
+          - comparison_operator: "="
+            id: cond_refund
+            value: refund
+            varType: string
+            variable_selector:
+            - validate_and_route
+            - route
+          id: refund
+          logical_operator: and
+        - case_id: complaint
+          conditions:
+          - comparison_operator: "="
+            id: cond_complaint
+            value: complaint
+            varType: string
+            variable_selector:
+            - validate_and_route
+            - route
+          id: complaint
+          logical_operator: and
+        desc: 按缺失、格式错误、查订单、退款、投诉、兜底咨询分流。
+        selected: false
+        title: 条件分支：售后意图路由
+        type: if-else
+      height: 360
+      id: route_by_intent
+      position:
+        x: 980
+        "y": 260
+      positionAbsolute:
+        x: 980
+        "y": 260
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: 需要先确认订单号才能继续处理。请提供订单号，格式为 OD + 12 位数字，例如 OD202605240001。
+        desc: 订单号缺失时追问，不调用订单、退款或投诉工具。
+        selected: false
+        title: 追问订单号
+        type: answer
+        variables: []
+      height: 118
+      id: answer_missing_order
+      position:
+        x: 1280
+        "y": 20
+      positionAbsolute:
+        x: 1280
+        "y": 20
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: 订单号格式不正确。正确格式是 OD + 12 位数字，例如 OD202605240001。请核对后重新发送；在订单号合法前，我不会调用订单、退款或投诉工具。
+        desc: 订单号格式错误时提示规则，不调用工具。
+        selected: false
+        title: 提示订单号格式错误
+        type: answer
+        variables: []
+      height: 134
+      id: answer_invalid_order
+      position:
+        x: 1280
+        "y": 170
+      positionAbsolute:
+        x: 1280
+        "y": 170
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: |
+          ORDERS = {
+              "OD202605240001": {"status": "已发货", "amount": 299, "product": "无线蓝牙耳机", "can_refund": True},
+              "OD202605240002": {"status": "已签收", "amount": 129, "product": "手机壳", "can_refund": True},
+              "OD202605240003": {"status": "已签收", "amount": 899, "product": "机械键盘", "can_refund": True},
+          }
+
+          def main(order_id: str) -> dict:
+              order = ORDERS.get(order_id)
+              if not order:
+                  return {
+                      "status": "未找到",
+                      "amount": 0,
+                      "product": "",
+                      "can_refund": "false",
+                      "reply": f"没有查询到订单 {order_id}。请确认订单号是否正确，格式应为 OD + 12 位数字。",
+                  }
+              can_refund_text = "是" if order["can_refund"] else "否"
+              reply = (
+                  f"已为你查询订单 {order_id}：\n"
+                  f"- 商品：{order['product']}\n"
+                  f"- 订单状态：{order['status']}\n"
+                  f"- 订单金额：{order['amount']} 元\n"
+                  f"- 是否可退款：{can_refund_text}\n\n"
+                  "如需退款或投诉，也可以继续告诉我你的诉求。"
+              )
+              return {
+                  "status": order["status"],
+                  "amount": order["amount"],
+                  "product": order["product"],
+                  "can_refund": "true" if order["can_refund"] else "false",
+                  "reply": reply,
+              }
+        code_language: python3
+        desc: 模拟工具 query_order：输入 order_id，输出订单状态、金额、商品名、是否可退款。
+        outputs:
+          amount:
+            children:
+            type: number
+          can_refund:
+            children:
+            type: string
+          product:
+            children:
+            type: string
+          reply:
+            children:
+            type: string
+          status:
+            children:
+            type: string
+        selected: false
+        title: 工具：query_order
+        type: code
+        variables:
+        - value_selector:
+          - validate_and_route
+          - order_id
+          variable: order_id
+      height: 82
+      id: tool_query_order
+      position:
+        x: 1280
+        "y": 340
+      positionAbsolute:
+        x: 1280
+        "y": 340
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: |
+          ORDERS = {
+              "OD202605240001": {"status": "已发货", "amount": 299, "product": "无线蓝牙耳机", "can_refund": True},
+              "OD202605240002": {"status": "已签收", "amount": 129, "product": "手机壳", "can_refund": True},
+              "OD202605240003": {"status": "已签收", "amount": 899, "product": "机械键盘", "can_refund": True},
+          }
+
+
+          def main(order_id: str, reason: str) -> dict:
+              order = ORDERS.get(order_id)
+              if not order:
+                  return {
+                      "amount": 0,
+                      "can_refund": "false",
+                      "need_human_check": "false",
+                      "message": f"没有查询到订单 {order_id}，暂时无法申请退款。请核对订单号后重试。",
+                      "reply": f"没有查询到订单 {order_id}，暂时无法申请退款。请核对订单号后重试。",
+                      "order_status": "未找到",
+                      "product": "",
+                  }
+              amount = order["amount"]
+              can_refund = bool(order["can_refund"])
+              need_human_check = amount > 500
+              if not can_refund:
+                  message = "该订单当前不满足退款条件，建议转人工客服进一步确认。"
+              elif need_human_check:
+                  message = "该订单退款金额超过 500 元，需要人工客服审核。我已为你提交人工审核，请等待客服确认。"
+              else:
+                  message = f"该订单满足自动退款条件，预计退款金额 {amount} 元。我已为你提交自动退款处理。"
+
+              reason_text = reason.strip() if reason else "未填写"
+              reply = "\n".join([
+                  "退款申请已受理：",
+                  f"- 订单号：{order_id}",
+                  f"- 商品：{order['product']}",
+                  f"- 退款金额：{amount} 元",
+                  f"- 退款原因：{reason_text}",
+                  f"- 是否需要人工审核：{'是' if need_human_check else '否'}",
+                  "",
+                  message,
+              ])
+              return {
+                  "amount": amount,
+                  "can_refund": "true" if can_refund else "false",
+                  "need_human_check": "true" if need_human_check else "false",
+                  "message": message,
+                  "reply": reply,
+                  "order_status": order["status"],
+                  "product": order["product"],
+              }
+        code_language: python3
+        desc: 模拟工具 check_refund：输入 order_id、reason；amount > 500 时触发人工审核提示。
+        outputs:
+          amount:
+            children:
+            type: number
+          can_refund:
+            children:
+            type: string
+          message:
+            children:
+            type: string
+          need_human_check:
+            children:
+            type: string
+          reply:
+            children:
+            type: string
+          order_status:
+            children:
+            type: string
+          product:
+            children:
+            type: string
+        selected: false
+        title: 工具：check_refund
+        type: code
+        variables:
+        - value_selector:
+          - validate_and_route
+          - order_id
+          variable: order_id
+        - value_selector:
+          - validate_and_route
+          - reason
+          variable: reason
+      height: 82
+      id: tool_check_refund
+      position:
+        x: 1280
+        "y": 470
+      positionAbsolute:
+        x: 1280
+        "y": 470
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: |
+          ORDERS = {
+              "OD202605240001": {"status": "已发货", "amount": 299, "product": "无线蓝牙耳机", "can_refund": True},
+              "OD202605240002": {"status": "已签收", "amount": 129, "product": "手机壳", "can_refund": True},
+              "OD202605240003": {"status": "已签收", "amount": 899, "product": "机械键盘", "can_refund": True},
+          }
+
+
+          def main(order_id: str, complaint_type: str, description: str) -> dict:
+              order = ORDERS.get(order_id)
+              if not order:
+                  message = f"没有查询到订单 {order_id}，暂时无法创建投诉工单。请核对订单号后再提交投诉。"
+                  return {
+                      "found": "false",
+                      "ticket_id": "",
+                      "status": "未创建",
+                      "message": message,
+                      "reply": message,
+                      "order_status": "未找到",
+                      "amount": 0,
+                      "product": "",
+                  }
+
+              safe_type = complaint_type.strip() if complaint_type else "售后投诉"
+              safe_description = description.strip() if description else "用户未补充详细描述"
+              ticket_id = f"CP{order_id[-4:]}001"
+              message = "投诉工单已创建，我们会尽快安排客服跟进。"
+              reply = "\n".join([
+                  "已为你创建投诉工单：",
+                  f"- 工单号：{ticket_id}",
+                  f"- 订单号：{order_id}",
+                  f"- 投诉类型：{safe_type}",
+                  f"- 问题描述：{safe_description}",
+                  "- 工单状态：已创建",
+                  "",
+                  message,
+              ])
+              return {
+                  "found": "true",
+                  "ticket_id": ticket_id,
+                  "status": "已创建",
+                  "message": message,
+                  "reply": reply,
+                  "order_status": order["status"],
+                  "amount": order["amount"],
+                  "product": order["product"],
+              }
+        code_language: python3
+        desc: 模拟工具 create_complaint_ticket：输入 order_id、complaint_type、description，输出工单信息。
+        outputs:
+          message:
+            children:
+            type: string
+          reply:
+            children:
+            type: string
+          status:
+            children:
+            type: string
+          ticket_id:
+            children:
+            type: string
+          order_status:
+            children:
+            type: string
+          amount:
+            children:
+            type: number
+          product:
+            children:
+            type: string
+          found:
+            children:
+            type: string
+        selected: false
+        title: 工具：create_complaint_ticket
+        type: code
+        variables:
+        - value_selector:
+          - validate_and_route
+          - order_id
+          variable: order_id
+        - value_selector:
+          - validate_and_route
+          - complaint_type
+          variable: complaint_type
+        - value_selector:
+          - validate_and_route
+          - description
+          variable: description
+      height: 82
+      id: tool_create_complaint_ticket
+      position:
+        x: 1280
+        "y": 600
+      positionAbsolute:
+        x: 1280
+        "y": 600
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: "{{#tool_query_order.reply#}}"
+        desc: 返回 query_order 模拟工具结果。
+        selected: false
+        title: 回复：订单查询结果
+        type: answer
+        variables: []
+      height: 103
+      id: answer_query_order
+      position:
+        x: 1580
+        "y": 340
+      positionAbsolute:
+        x: 1580
+        "y": 340
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: 你好呀，我是电商售后客服 Demo，可以帮你查询订单、申请退款或提交投诉。你可以直接告诉我诉求；如果已经有订单号，也可以一起发给我。
+        desc: 闲聊 / 其他咨询兜底回复。
+        selected: false
+        title: 兜底回复
+        type: answer
+        variables: []
+      height: 118
+      id: answer_fallback
+      position:
+        x: 1280
+        "y": 730
+      positionAbsolute:
+        x: 1280
+        "y": 730
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: |
+          ORDERS = {
+              "OD202605240001": {"status": "已发货", "amount": 299, "product": "无线蓝牙耳机", "can_refund": True},
+              "OD202605240002": {"status": "已签收", "amount": 129, "product": "手机壳", "can_refund": True},
+              "OD202605240003": {"status": "已签收", "amount": 899, "product": "机械键盘", "can_refund": True},
+          }
+
+          POLICIES = [
+              "已发货订单不能立即退款，需要等待签收或拒收。",
+              "已签收订单 7 天内可申请无理由退货。",
+              "退款金额超过 500 元需要人工审核。",
+              "食品、定制商品、虚拟商品不支持无理由退款。",
+              "物流超过 72 小时未更新，可以创建物流投诉工单。",
+              "用户情绪强烈时，需要优先安抚并升级人工客服。",
+          ]
+
+
+          def main(query: str, intent: str, order_id: str, reason: str, complaint_type: str, user_emotion: str, policy_question: str) -> dict:
+              q = query or ""
+              order = ORDERS.get(order_id, {})
+              status = order.get("status", "")
+              amount = order.get("amount", 0)
+              matched = []
+
+              if intent == "refund" and status == "已发货":
+                  matched.append(POLICIES[0])
+              if intent == "refund" and status == "已签收":
+                  matched.append(POLICIES[1])
+              if intent == "refund" and amount > 500:
+                  matched.append(POLICIES[2])
+              if any(k in q + reason for k in ["食品", "定制", "虚拟"]):
+                  matched.append(POLICIES[3])
+              if "物流" in (q + complaint_type):
+                  matched.append(POLICIES[4])
+              if user_emotion in ["angry", "urgent"] or any(k in q for k in ["生气", "离谱", "不退就投诉"]):
+                  matched.append(POLICIES[5])
+              if policy_question == "true" and not matched:
+                  matched.extend([POLICIES[0], POLICIES[1], POLICIES[2]])
+
+              if not matched:
+                  matched.append("未命中特定售后政策，按通用客服规则处理。")
+
+              return {
+                  "matched_policies": "\n".join(dict.fromkeys(matched)),
+                  "policy_source": "static_after_sales_policy",
+              }
+        code_language: python3
+        desc: 硬编码 6 条售后政策，按关键词和订单上下文轻量匹配。
+        outputs:
+          matched_policies:
+            children:
+            type: string
+          policy_source:
+            children:
+            type: string
+        selected: false
+        title: policy_lookup：轻量售后政策检索
+        type: code
+        variables:
+        - value_selector:
+          - sys
+          - query
+          variable: query
+        - value_selector:
+          - validate_and_route
+          - intent
+          variable: intent
+        - value_selector:
+          - validate_and_route
+          - order_id
+          variable: order_id
+        - value_selector:
+          - validate_and_route
+          - reason
+          variable: reason
+        - value_selector:
+          - validate_and_route
+          - complaint_type
+          variable: complaint_type
+        - value_selector:
+          - validate_and_route
+          - user_emotion
+          variable: user_emotion
+        - value_selector:
+          - validate_and_route
+          - policy_question
+          variable: policy_question
+      height: 82
+      id: policy_lookup
+      position:
+        x: 1580
+        "y": 470
+      positionAbsolute:
+        x: 1580
+        "y": 470
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: |
+          ORDERS = {
+              "OD202605240001": {"status": "已发货", "amount": 299, "product": "无线蓝牙耳机", "can_refund": True},
+              "OD202605240002": {"status": "已签收", "amount": 129, "product": "手机壳", "can_refund": True},
+              "OD202605240003": {"status": "已签收", "amount": 899, "product": "机械键盘", "can_refund": True},
+          }
+
+
+          def main(query: str, intent: str, order_id: str, complaint_type: str, user_emotion: str, compensation_requested: str, matched_policies: str) -> dict:
+              q = query or ""
+              order = ORDERS.get(order_id, {})
+              amount = int(order.get("amount", 0) or 0)
+              status = order.get("status", "")
+              score = 0
+              reasons = []
+
+              if amount > 500:
+                  score += 40
+                  reasons.append("amount > 500：+40")
+              if user_emotion == "angry":
+                  score += 20
+                  reasons.append("user_emotion = angry：+20")
+              if user_emotion == "urgent":
+                  score += 15
+                  reasons.append("user_emotion = urgent：+15")
+              if "物流" in (complaint_type or ""):
+                  score += 10
+                  reasons.append("complaint_type 包含物流：+10")
+              if "质量" in (complaint_type or q):
+                  score += 20
+                  reasons.append("complaint_type/用户问题包含质量：+20")
+              if compensation_requested == "true":
+                  score += 20
+                  reasons.append("compensation_requested = true：+20")
+              if any(k in q for k in ["赔偿", "补偿", "投诉威胁", "不退就投诉"]):
+                  score += 20
+                  reasons.append("用户表达赔偿/补偿/投诉威胁：+20")
+              if status == "已发货" and intent == "refund":
+                  score += 10
+                  reasons.append("已发货订单申请退款：+10")
+
+              if score < 30:
+                  level = "low"
+              elif score < 60:
+                  level = "medium"
+              else:
+                  level = "high"
+
+              return {
+                  "risk_score": str(score),
+                  "risk_level": level,
+                  "risk_reasons": "；".join(reasons) if reasons else "未命中风险加分规则",
+              }
+        code_language: python3
+        desc: 根据金额、情绪、投诉类型、赔偿诉求等计算风险分。
+        outputs:
+          risk_score:
+            children:
+            type: string
+          risk_level:
+            children:
+            type: string
+          risk_reasons:
+            children:
+            type: string
+        selected: false
+        title: calculate_risk_score：风险评分
+        type: code
+        variables:
+        - value_selector:
+          - sys
+          - query
+          variable: query
+        - value_selector:
+          - validate_and_route
+          - intent
+          variable: intent
+        - value_selector:
+          - validate_and_route
+          - order_id
+          variable: order_id
+        - value_selector:
+          - validate_and_route
+          - complaint_type
+          variable: complaint_type
+        - value_selector:
+          - validate_and_route
+          - user_emotion
+          variable: user_emotion
+        - value_selector:
+          - validate_and_route
+          - compensation_requested
+          variable: compensation_requested
+        - value_selector:
+          - policy_lookup
+          - matched_policies
+          variable: matched_policies
+      height: 82
+      id: calculate_risk_score
+      position:
+        x: 1880
+        "y": 470
+      positionAbsolute:
+        x: 1880
+        "y": 470
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: |
+          ORDERS = {
+              "OD202605240001": {"status": "已发货", "amount": 299, "product": "无线蓝牙耳机", "can_refund": True},
+              "OD202605240002": {"status": "已签收", "amount": 129, "product": "手机壳", "can_refund": True},
+              "OD202605240003": {"status": "已签收", "amount": 899, "product": "机械键盘", "can_refund": True},
+          }
+
+
+          def main(intent: str, order_id: str, reason: str, complaint_type: str, description: str, matched_policies: str, risk_score: str, risk_level: str) -> dict:
+              order = ORDERS.get(order_id)
+              if intent == "complaint" and not order:
+                  return {"draft_reply": f"没有查询到订单 {order_id}，暂时无法创建投诉工单。请核对订单号后再提交投诉。"}
+
+              order = order or {"status": "未知", "amount": 0, "product": "", "can_refund": False}
+              amount = order["amount"]
+              status = order["status"]
+              product = order["product"]
+              policies = matched_policies or "未命中特定售后政策，按通用客服规则处理。"
+              risk_line = f"当前风险等级：{risk_level}（{risk_score} 分）。"
+
+              if intent == "refund":
+                  if risk_level == "high" or amount > 500:
+                      action = "该场景需要人工客服审核，我已记录你的退款诉求并提交人工处理，请等待客服确认。"
+                  elif status == "已发货":
+                      action = "该订单当前为已发货状态，不能直接承诺退款成功；建议等待签收后申请退货退款，或拒收后再处理退款。"
+                  else:
+                      action = f"该订单可进入退款处理流程，预计退款金额 {amount} 元，后续仍以平台审核结果为准。"
+                  reply = "\n".join([
+                      "我理解你的退款诉求，先帮你核对订单：",
+                      f"- 订单号：{order_id}",
+                      f"- 商品：{product}",
+                      f"- 订单状态：{status}",
+                      f"- 订单金额：{amount} 元",
+                      f"- 退款原因：{reason or '未填写'}",
+                      "",
+                      "匹配到的售后政策：",
+                      policies,
+                      "",
+                      risk_line,
+                      action,
+                  ])
+              else:
+                  safe_type = complaint_type or "售后投诉"
+                  safe_desc = description or "用户未补充详细描述"
+                  ticket_id = f"CP{order_id[-4:]}001"
+                  if risk_level == "high":
+                      action = "你的诉求风险等级较高，我会优先安抚并提交人工客服跟进，不会在此直接承诺赔偿或退款成功。"
+                  else:
+                      action = "我已为你创建投诉工单，我们会尽快安排客服跟进。"
+                  reply = "\n".join([
+                      "我理解你的不满，已记录投诉信息：",
+                      f"- 工单号：{ticket_id}",
+                      f"- 订单号：{order_id}",
+                      f"- 投诉类型：{safe_type}",
+                      f"- 问题描述：{safe_desc}",
+                      "",
+                      "匹配到的售后政策：",
+                      policies,
+                      "",
+                      risk_line,
+                      action,
+                  ])
+              return {"draft_reply": reply}
+        code_language: python3
+        desc: 结合政策和风险生成 refund/complaint 路径初版回复。
+        outputs:
+          draft_reply:
+            children:
+            type: string
+        selected: false
+        title: 生成 V4 初版客服回复
+        type: code
+        variables:
+        - value_selector:
+          - validate_and_route
+          - intent
+          variable: intent
+        - value_selector:
+          - validate_and_route
+          - order_id
+          variable: order_id
+        - value_selector:
+          - validate_and_route
+          - reason
+          variable: reason
+        - value_selector:
+          - validate_and_route
+          - complaint_type
+          variable: complaint_type
+        - value_selector:
+          - validate_and_route
+          - description
+          variable: description
+        - value_selector:
+          - policy_lookup
+          - matched_policies
+          variable: matched_policies
+        - value_selector:
+          - calculate_risk_score
+          - risk_score
+          variable: risk_score
+        - value_selector:
+          - calculate_risk_score
+          - risk_level
+          variable: risk_level
+      height: 82
+      id: draft_v4_reply
+      position:
+        x: 2180
+        "y": 470
+      positionAbsolute:
+        x: 2180
+        "y": 470
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: 检查初版客服回复是否安全、准确，防止乱承诺。
+        model:
+          completion_params:
+            temperature: 0.0
+          mode: chat
+          name: gpt-4o-mini
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 3f481cef-4292-46f9-8968-63df0205b20d
+          role: system
+          text: 你是电商售后客服回复安全校验器。只输出 JSON，不要输出 Markdown。输出格式：{"pass":true,"issues":[],"revised_answer":""}。校验规则：不能编造订单信息；不能和工具/政策/风险结果矛盾；不能承诺工具没有返回的退款成功；高风险场景不能直接说已退款成功；订单号缺失或格式错误时不能调用工具；涉及退款/投诉政策要结合
+            matched_policies；语气要有客服安抚感。
+        - id: dc12f322-95fa-4c5d-bcf5-492d4f567ddd
+          role: user
+          text: |-
+            用户原问题：{{#sys.query#}}
+            Agent/路由抽取：intent={{#validate_and_route.intent#}}, order_id={{#validate_and_route.order_id#}}, reason={{#validate_and_route.reason#}}, complaint_type={{#validate_and_route.complaint_type#}}, description={{#validate_and_route.description#}}, user_emotion={{#validate_and_route.user_emotion#}}, requested_action={{#validate_and_route.requested_action#}}, compensation_requested={{#validate_and_route.compensation_requested#}}, policy_question={{#validate_and_route.policy_question#}}, route={{#validate_and_route.route#}}
+            政策：{{#policy_lookup.matched_policies#}}
+            风险：score={{#calculate_risk_score.risk_score#}}, level={{#calculate_risk_score.risk_level#}}, reasons={{#calculate_risk_score.risk_reasons#}}
+            初版客服回复：{{#draft_v4_reply.draft_reply#}}
+        selected: false
+        title: answer_verifier：输出校验
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 98
+      id: answer_verifier
+      position:
+        x: 2480
+        "y": 470
+      positionAbsolute:
+        x: 2480
+        "y": 470
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: |
+          import json
+          import re
+
+
+          def _parse(text):
+              if not text:
+                  return {}
+              text = text.strip()
+              try:
+                  return json.loads(text)
+              except Exception:
+                  match = re.search(r"{.*}", text, re.S)
+                  if match:
+                      try:
+                          return json.loads(match.group(0))
+                      except Exception:
+                          return {}
+              return {}
+
+
+          def main(verifier_text: str, draft_reply: str) -> dict:
+              data = _parse(verifier_text)
+              passed = data.get("pass", True)
+              if isinstance(passed, str):
+                  passed = passed.lower() == "true"
+              revised = data.get("revised_answer") or ""
+              issues = data.get("issues", [])
+              if passed or not revised:
+                  final = draft_reply
+                  pass_text = "true"
+              else:
+                  final = revised
+                  pass_text = "false"
+              return {
+                  "final_reply": final,
+                  "verifier_pass": pass_text,
+                  "verifier_issues": "; ".join(issues) if isinstance(issues, list) else str(issues),
+              }
+        code_language: python3
+        desc: pass=true 使用 draft_reply，否则使用 revised_answer。
+        outputs:
+          final_reply:
+            children:
+            type: string
+          verifier_pass:
+            children:
+            type: string
+          verifier_issues:
+            children:
+            type: string
+        selected: false
+        title: 选择 Verifier 后最终回复
+        type: code
+        variables:
+        - value_selector:
+          - answer_verifier
+          - text
+          variable: verifier_text
+        - value_selector:
+          - draft_v4_reply
+          - draft_reply
+          variable: draft_reply
+      height: 82
+      id: select_verified_answer
+      position:
+        x: 2780
+        "y": 470
+      positionAbsolute:
+        x: 2780
+        "y": 470
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: "{{#select_verified_answer.final_reply#}}"
+        desc: V4 refund/complaint 路径最终回复。
+        selected: false
+        title: 回复：V4 校验后客服回复
+        type: answer
+        variables: []
+      height: 103
+      id: answer_v4_final
+      position:
+        x: 3080
+        "y": 470
+      positionAbsolute:
+        x: 3080
+        "y": 470
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: 我已收到订单号 {{#validate_and_route.order_id#}}。请问你想查询订单状态、申请退款，还是提交投诉？
+        desc: 用户只输入订单号且没有 pending_intent 时追问具体诉求。
+        selected: false
+        title: 回复：仅收到订单号
+        type: answer
+        variables: []
+      height: 118
+      id: answer_order_only
+      position:
+        x: 1280
+        "y": 280
+      positionAbsolute:
+        x: 1280
+        "y": 280
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        assigned_variable_selector:
+        - conversation
+        - last_order_id
+        desc: V4.1 short-term memory update
+        input_variable_selector:
+        - validate_and_route
+        - new_last_order_id
+        selected: false
+        title: 记忆：last_order_id
+        type: assigner
+        write_mode: over-write
+      height: 132
+      id: assign_last_order_id
+      position:
+        x: 980
+        "y": 40
+      positionAbsolute:
+        x: 980
+        "y": 40
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        assigned_variable_selector:
+        - conversation
+        - pending_intent
+        desc: V4.1 short-term memory update
+        input_variable_selector:
+        - validate_and_route
+        - new_pending_intent
+        selected: false
+        title: 记忆：pending_intent
+        type: assigner
+        write_mode: over-write
+      height: 132
+      id: assign_pending_intent
+      position:
+        x: 1260
+        "y": 40
+      positionAbsolute:
+        x: 1260
+        "y": 40
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        assigned_variable_selector:
+        - conversation
+        - pending_reason
+        desc: V4.1 short-term memory update
+        input_variable_selector:
+        - validate_and_route
+        - new_pending_reason
+        selected: false
+        title: 记忆：pending_reason
+        type: assigner
+        write_mode: over-write
+      height: 132
+      id: assign_pending_reason
+      position:
+        x: 1540
+        "y": 40
+      positionAbsolute:
+        x: 1540
+        "y": 40
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        assigned_variable_selector:
+        - conversation
+        - pending_complaint_type
+        desc: V4.1 short-term memory update
+        input_variable_selector:
+        - validate_and_route
+        - new_pending_complaint_type
+        selected: false
+        title: 记忆：pending_complaint_type
+        type: assigner
+        write_mode: over-write
+      height: 132
+      id: assign_pending_complaint_type
+      position:
+        x: 1820
+        "y": 40
+      positionAbsolute:
+        x: 1820
+        "y": 40
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        assigned_variable_selector:
+        - conversation
+        - pending_description
+        desc: V4.1 short-term memory update
+        input_variable_selector:
+        - validate_and_route
+        - new_pending_description
+        selected: false
+        title: 记忆：pending_description
+        type: assigner
+        write_mode: over-write
+      height: 132
+      id: assign_pending_description
+      position:
+        x: 2100
+        "y": 40
+      positionAbsolute:
+        x: 2100
+        "y": 40
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        assigned_variable_selector:
+        - conversation
+        - last_route
+        desc: V4.1 short-term memory update
+        input_variable_selector:
+        - validate_and_route
+        - new_last_route
+        selected: false
+        title: 记忆：last_route
+        type: assigner
+        write_mode: over-write
+      height: 132
+      id: assign_last_route
+      position:
+        x: 2380
+        "y": 40
+      positionAbsolute:
+        x: 2380
+        "y": 40
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: -153.0
+      "y": 11.0
+      zoom: 0.7
